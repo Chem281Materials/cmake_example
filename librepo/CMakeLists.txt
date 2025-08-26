@@ -38,8 +38,48 @@ else()
   message(FATAL_ERROR "Unrecognized value of SimpleMPI_USE_MPI" )
 endif()
 if ( MPI_FOUND )
-  target_link_libraries(MPIWrapper PUBLIC MPI::MPI_CXX)
-  target_compile_definitions(MPIWrapper PUBLIC __use_mpi=1)
+  target_link_libraries(MPIWrapper PRIVATE MPI::MPI_CXX)
+  target_compile_definitions(MPIWrapper PRIVATE __use_mpi=1)
 else()
   message(WARNING "MPI was not found. Disabling MPI support.")
 endif()
+
+
+
+
+#######################################
+# BEGIN INSTALL SECTION
+#######################################
+
+include(GNUInstallDirs)
+
+install(TARGETS MPIWrapper
+        EXPORT MPIWrapperTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/MPIWrapperConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/MPIWrapperConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/MPIWrapper)
+
+write_basic_package_version_file(
+  "MPIWrapperConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/MPIWrapperConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/MPIWrapperConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/MPIWrapper)
+
+install(
+  EXPORT MPIWrapperTargets
+  FILE MPIWrapperTargets.cmake
+  NAMESPACE MPIWrapper::
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/MPIWrapper)
