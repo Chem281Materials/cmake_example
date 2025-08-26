@@ -16,18 +16,18 @@ int mp_finalize(void) {
 #endif
 }
 
-int mp_comm_rank( MPI_Comm comm, int *rank ) {
+int mp_comm_rank( int *rank ) {
 #ifdef __use_mpi
-  return MPI_Comm_rank(comm, rank);
+  return MPI_Comm_rank(MPI_COMM_WORLD, rank);
 #else
   *rank = 0;
   return 0;
 #endif
 }
 
-int mp_comm_size( MPI_Comm comm, int *size ) {
+int mp_comm_size( int *size ) {
 #ifdef __use_mpi
-  return MPI_Comm_size(comm, size);
+  return MPI_Comm_size(MPI_COMM_WORLD, size);
 #else
   *size = 0;
   return 0;
